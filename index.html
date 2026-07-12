@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Live NASCAR Cup Series stage points tracker for family race pools" />
+  <title>NASCAR Stage Points Tracker</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<!-- ── Header ─────────────────────────────────────────────── --><header>
+<div class="header-inner">
+<div class="brand">
+<div class="brand-flag">🏁</div>
+<div class="brand-text">
+<h1 id="race-name">NASCAR Stage Points</h1>
+<p><span id="track-name"></span></p>
+</div>
+</div>
+<div class="status-bar"><span class="stage-badge" id="stage-badge">Stage 1</span> <span class="lap-badge" id="lap-badge" style="display: none;">Lap &mdash; / &mdash;</span> <span class="status-pill" id="status-pill"> <span class="dot"></span> <span class="label">Loading&hellip;</span> </span> <button id="btn-refresh" title="Refresh now" style="background: none; border: none; cursor: pointer; color: #888; font-size: 1rem; padding: .15rem .3rem;" aria-label="Refresh data">↻</button> <span class="last-updated" id="last-updated"></span></div>
+</div>
+</header><!-- ── Main ───────────────────────────────────────────────── --><main><!-- Stage progress cards -->
+<div class="stage-strip">
+<div class="stage-card" id="sc1">
+<div class="sc-label">Stage 1</div>
+<div class="sc-status">Upcoming</div>
+</div>
+<div class="stage-card" id="sc2">
+<div class="sc-label">Stage 2</div>
+<div class="sc-status">Upcoming</div>
+</div>
+<div class="stage-card" id="sc3">
+<div class="sc-label">Final Stage</div>
+<div class="sc-status">Upcoming</div>
+</div>
+</div>
+<!-- Points table -->
+<p class="section-title">Live Stage Points &mdash; sorted by running position</p>
+<div class="table-wrapper">
+<table><colgroup><col class="col-pos"><col class="col-player"><col class="col-driver"><col class="col-car"><col class="col-s1"><col class="col-s2"><col class="col-final"><col class="col-total"></colgroup>
+<thead>
+<tr>
+<th>POS</th>
+<th class="col-left">PLAYER</th>
+<th class="col-left col-driver">DRIVER</th>
+<th class="col-car">CAR</th>
+<th class="col-s1">STG 1</th>
+<th class="col-s2">STG 2</th>
+<th class="col-final">FINAL</th>
+<th class="col-total">TOTAL</th>
+</tr>
+</thead>
+<tbody id="points-tbody"><!-- Rows injected by script.js -->
+<tr>
+<td colspan="8">
+<div class="state-box">
+<div class="state-icon">⏳</div>
+<p>Loading race data&hellip;</p>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Legend note -->
+<p style="font-size: .7rem; color: #666; margin-top: -.5rem; padding-left: .25rem;">* = projected points if the stage ended at this moment &nbsp;|&nbsp; &mdash; = stage not yet started or race not complete</p>
+
+<div class="debug-status" style="margin-top: 1.5rem;" id="db_status">DEBUG AREA<br></div>
+
+</main><!-- ── Footer ─────────────────────────────────────────────── --><footer>
+<p id="footer-refresh"></p>
+<p style="margin-top: .35rem;">Data sourced from NASCAR's live JSON feed &nbsp;&middot;&nbsp; Edit <code>config.js</code> each race week to update driver picks &amp; URLs.</p>
+</footer><!-- Scripts: config must load before script.js -->
+<p>
+<script type="module" src="main.js"></script>
+</p>
+</body>
+</html>
