@@ -14,6 +14,7 @@ function debug(msg) {
 }
 
 let currentFeed = null;
+let raceComplete = false;
 
 /* Parse out the player names */
 const DRIVER_TO_PLAYER = {};
@@ -54,6 +55,30 @@ function updateHeader(feed) {
     // Last updated timestamp
     lastUpdated.textContent = `Updated: ${new Date().toLocaleTimeString()}`;
 }
+
+function updateTrackName(feed) {
+  const el = document.getElementById("track-name");
+  if (!el) return;
+
+  // Try all common NASCAR fields
+  const name =
+    feed.track_name ||
+    feed.track_name_short ||
+    feed.venue_name ||
+    feed.track ||
+    feed.race_track ||
+    "Unknown Track";
+
+  el.textContent = name;
+}
+
+function updateRaceName(feed) {
+  const el = document.getElementById("race-name");
+  if (!el) return;
+
+  el.textContent = feed.run_name || "NASCAR Stage Points";
+}
+
 function updateStageCards(feed) {
     const lap = feed.lap_number;
     const sc1 = document.getElementById("sc1");
@@ -89,6 +114,7 @@ function buildLiveLookup(feed) {
     }
     return lookup;
 }
+
 function updatePointsTable(points) {
     const tbody = document.getElementById("points-tbody");
     if (!tbody)
@@ -101,7 +127,7 @@ function updatePointsTable(points) {
     
     // ⭐ Filter to only your drivers
     const filtered = points.filter(p => DRIVER_TO_PLAYER[p.driver_id]);
-    debug(`Filtered points to ${filtered.length} drivers based on player picks`);
+    // debug(`Filtered points to ${filtered.length} drivers based on player picks`);
     
     // ⭐ Sort only your drivers
     const sorted = filtered.sort((a, b) => {
@@ -121,16 +147,22 @@ function updatePointsTable(points) {
         debug(`Running position for driver ID ${p.driver_id}: ${runningPos}`);
         const stg1 = liveData?.stage_1_points ?? p.stage_1_points;
         const stg2 = liveData?.stage_2_points ?? p.stage_2_points;
-        const final = liveData?.final_stage_points ?? 0;
-        const total = stg1 + stg2 + final;
-        tr.innerHTML = `
+        let total = 0; // Initialize total to 0
+        debug('Flag State: ' +  raceComplete); 
+        if (raceComplete) {
+            total = p.points_earned_this_race;
+        }
+        else{
+            total = stg1 + stg2;
+        }
+
+      tr.innerHTML = `
       <td>${runningPos}</td>
       <td>${player}</td>
       <td>${p.first_name} ${p.last_name}</td>
       <td>${p.car_number}</td>
       <td>${stg1}</td>
       <td>${stg2}</td>
-      <td>${final}</td>
       <td>${total}</td>
     `;
         tbody.appendChild(tr);
@@ -140,11 +172,17 @@ async function start() {
     const feed = await loadLiveFeed();
     const points = await loadLivePoints();
     console.log("Live Feed:", feed);
-    debug(`Loaded live feed with ${feed.vehicles.length} vehicles`);
+    //debug(`Loaded live feed with ${feed.vehicles.length} vehicles`);
     console.log("Points:", points);
-    debug(`Loaded points ${JSON.stringify(points)}\n`);
-    currentFeed = feed; // ← ADD THIS LINE
+    // debug(`Loaded points ${JSON.stringify(points)}\n`);
+    // currentFeed = feed; // ← ADD THIS LINE
+    if (!raceComplete && Number(feed.flag_state) === 9) {
+        raceComplete = true;
+        console.log("Race is now complete!");
+    }
     updateHeader(feed);
+    updateTrackName(feed);
+    updateRaceName(feed);
     updateStageCards(feed);
     updatePointsTable(points);
 }

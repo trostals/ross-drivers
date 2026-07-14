@@ -47,10 +47,10 @@ main { max-width: 900px; margin: 1.5rem auto 0; padding: 0 1rem; }
 
 .table-wrapper { background: var(--surface); border-radius: var(--radius); border: 1px solid var(--border); overflow: hidden; box-shadow: var(--shadow); margin-bottom: 1.5rem; }
 table { width: 100%; border-collapse: collapse; }
-col.col-pos { width: 52px; } col.col-car { width: 52px; }
-col.col-s1,col.col-s2,col.col-final,col.col-total { width: 76px; }
+col.col-pos { width: 15px; } col.col-car { width: 15px; }
+col.col-s1,col.col-s2,col.col-final,col.col-total { width: 76px; justify-content: left; }
 
-thead th { background: var(--surface2); padding: .65rem .75rem; text-align: center; font-size: .68rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--text-muted); border-bottom: 1px solid var(--border); white-space: nowrap; }
+thead th { background: var(--surface2); padding: .65rem .75rem; text-align: left; font-size: .68rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--text-muted); border-bottom: 1px solid var(--border); white-space: nowrap; }
 thead th.col-left { text-align: left; }
 
 tbody tr { border-bottom: 1px solid var(--border); transition: background .2s; }
@@ -59,7 +59,7 @@ tbody tr:hover { background: rgba(255,255,255,.03); }
 tbody tr td:first-child { border-left: 4px solid transparent; transition: border-color .4s; }
 tbody tr.has-color td:first-child { border-left-color: var(--player-color); }
 
-td { padding: .75rem; font-size: .9rem; text-align: center; vertical-align: middle; }
+td { padding: .75rem; font-size: .9rem; text-align: left; vertical-align: middle; }
 td.col-left { text-align: left; }
 
 .pos-cell { font-size: 1rem; font-weight: 700; color: var(--text-muted); }
@@ -93,13 +93,46 @@ tr.just-moved { animation: rowHighlight .9s ease-out forwards; }
 
 footer { max-width: 900px; margin: 2rem auto 0; padding: 0 1rem; font-size: .68rem; color: var(--text-muted); text-align: center; line-height: 1.6; }
 
-@media (max-width: 600px) {
+@media (max-width: 520px) {
+  table {
+    table-layout: fixed;
+  }
+  /* Player column: prevent expansion */
+  th.col-player,
+  td.col-player {
+    width: 100px;        /* adjust to taste */
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+
+  /* Hide col definitions for hidden columns */
+  col.col-driver,
+  col.col-car {
+    display: none;
+  }
+   
+  /* Stage columns: shrink for mobile */
+  /* Shrink stage columns */
+  col.col-s1,
+  col.col-s2,
+  col.col-total {
+    width: 50px;
+  }
+  
   col.col-driver,thead th.col-driver,td.col-driver,col.col-car,thead th.col-car,td.col-car { display: none; }
-  td,thead th { padding: .6rem .5rem; font-size: .82rem; }
+    
+  /* Tighter cell spacing */
+  td, thead th {
+    padding: .45rem .4rem;
+    font-size: .78rem;
+  }
+
   .stage-strip { flex-direction: column; }
+
   .status-bar { justify-content: flex-start; }
 }
-@media (max-width: 400px) { col.col-total,thead th.col-total,td.col-total { display: none; } }
+@media (max-width: 390px) { col.col-total,col.col-final,thead th.col-total,td.col-total { display: none; } }
 
 #db_status {
     height: 200px;          /* fixed height so it becomes a window */
