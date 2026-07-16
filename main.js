@@ -109,65 +109,84 @@ function updateStageCards(feed) {
 function buildLiveLookup(feed) {
     const lookup = {};
     for (const v of feed.vehicles) {
-        lookup[v.driver.driver_id] = v;
-        debug(`Live data for driver ID ${v.driver.driver_id}`);
+        lookup[v.vehicle_number] = v;   // MATCH BY CAR NUMBER
+        debug(`Live data for car #${v.vehicle_number}`);
     }
     return lookup;
 }
 
 function updatePointsTable(points) {
     const tbody = document.getElementById("points-tbody");
-    if (!tbody)
-    {
+    if (!tbody) {
         debug("Points table body not found");
         return;
     }
+
     tbody.innerHTML = "";
+
+    // Build lookup using CAR NUMBER (not driver_id)
     const live = currentFeed ? buildLiveLookup(currentFeed) : {};
     
-    // ⭐ Filter to only your drivers
+    console.log("FULL LIVE FEED VEHICLES:", currentFeed.vehicles);
+
+
+    // Filter to only your drivers
     const filtered = points.filter(p => DRIVER_TO_PLAYER[p.driver_id]);
-    // debug(`Filtered points to ${filtered.length} drivers based on player picks`);
-    
-    // ⭐ Sort only your drivers
+
+    // Sort by running position using car_number
     const sorted = filtered.sort((a, b) => {
-        const la = live[a.driver_id]?.running_position ?? 999;
-        debug(`Driver ID ${a.driver_id} running position: ${la}`);
-        const lb = live[b.driver_id]?.running_position ?? 999;
-        debug(`Driver ID ${b.driver_id} running position: ${lb}`);
+        const la = live[a.car_number]?.running_position ?? 999;
+        const lb = live[b.car_number]?.running_position ?? 999;
         return la - lb;
     });
+
     for (const p of sorted) {
         const tr = document.createElement("tr");
+
         const player = DRIVER_TO_PLAYER[p.driver_id] ?? "—";
-        debug(`\nUpdating points for driver ID ${p.driver_id} (Player: ${player})`);
-        const liveData = live[p.driver_id];
-        debug(`Live data for driver ID ${p.driver_id}: ${JSON.stringify(liveData)}`);
+
+        // Lookup live data using CAR NUMBER
+        const liveData = live[p.car_number];
+
+        // Running position
         const runningPos = liveData?.running_position ?? p.points_position;
-        debug(`Running position for driver ID ${p.driver_id}: ${runningPos}`);
+
+        // Stage points (prefer live feed)
         const stg1 = liveData?.stage_1_points ?? p.stage_1_points;
         const stg2 = liveData?.stage_2_points ?? p.stage_2_points;
-        let total = 0; // Initialize total to 0
-        debug('Flag State: ' +  raceComplete); 
+
+        // Total points
+        let total = 0;
+
         if (raceComplete) {
             total = p.points_earned_this_race;
-        }
-        else{
+        } else {
             total = stg1 + stg2;
         }
 
-      tr.innerHTML = `
-      <td>${runningPos}</td>
-      <td>${player}</td>
-      <td>${p.first_name} ${p.last_name}</td>
-      <td>${p.car_number}</td>
-      <td>${stg1}</td>
-      <td>${stg2}</td>
-      <td>${total}</td>
-    `;
+        // Build row
+        tr.innerHTML = `
+            <td>${runningPos}</td>
+            <td>${player}</td>
+
+            <td class="driver-block">
+                <div class="driver-name">${p.first_name} ${p.last_name}</div>
+                <div class="driver-sub">
+                    <span class="car-number">#${liveData?.vehicle_number ?? p.car_number ?? "?"}</span>
+                    <span class="dot">•</span>
+                    <span class="manufacturer">${liveData?.vehicle_manufacturer ?? "Unknown"}</span>
+                </div>
+            </td>
+
+            <td>${stg1}</td>
+            <td>${stg2}</td>
+            <td>${total}</td>
+        `;
+
         tbody.appendChild(tr);
     }
 }
+
 async function start() {
     const feed = await loadLiveFeed();
     const points = await loadLivePoints();
@@ -175,7 +194,9 @@ async function start() {
     //debug(`Loaded live feed with ${feed.vehicles.length} vehicles`);
     console.log("Points:", points);
     // debug(`Loaded points ${JSON.stringify(points)}\n`);
-    // currentFeed = feed; // ← ADD THIS LINE
+
+    currentFeed = feed; // ← ADD THIS LINE
+    
     if (!raceComplete && Number(feed.flag_state) === 9) {
         raceComplete = true;
         console.log("Race is now complete!");
