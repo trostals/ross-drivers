@@ -12,6 +12,8 @@ function debug(msg) {
     db_status.innerHTML += msg + "\n";
     db_status.scrollTop = db_status.scrollHeight;
 }
+// DEbug flag for using storede data vs live data.
+const useFile = true;
 
 let currentFeed = null;
 let raceComplete = false;
@@ -188,12 +190,14 @@ function updatePointsTable(points) {
 }
 
 async function start() {
-    const feed = await loadLiveFeed();
-    const points = await loadLivePoints();
+    debug:("Starting data load...");
+    
+    const feed = await loadLiveFeed(useFile);
+    const points = await loadLivePoints(useFile);
+    debug(" Debug flag: " + useFile);
+    console.log("Debug flag", useFile);
     console.log("Live Feed:", feed);
-    //debug(`Loaded live feed with ${feed.vehicles.length} vehicles`);
     console.log("Points:", points);
-    // debug(`Loaded points ${JSON.stringify(points)}\n`);
 
     currentFeed = feed; // ← ADD THIS LINE
     
@@ -207,5 +211,6 @@ async function start() {
     updateStageCards(feed);
     updatePointsTable(points);
 }
+
 start();
 document.getElementById("btn-refresh")?.addEventListener("click", start);
