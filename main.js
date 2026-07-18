@@ -12,8 +12,8 @@ function debug(msg) {
     db_status.innerHTML += msg + "\n";
     db_status.scrollTop = db_status.scrollHeight;
 }
-// DEbug flag for using storede data vs live data.
-const useFile = true;
+// Debug flag for using storede data vs live data.
+const useFile = false;
 
 let currentFeed = null;
 let raceComplete = false;
@@ -191,7 +191,7 @@ function updatePointsTable(points) {
 
 async function start() {
     debug:("Starting data load...");
-    
+
     const feed = await loadLiveFeed(useFile);
     const points = await loadLivePoints(useFile);
     debug(" Debug flag: " + useFile);

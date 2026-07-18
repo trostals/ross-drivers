@@ -5,7 +5,6 @@ export async function loadLiveFeed(loadfromfile = false) {
         return data.json();
     }
     else{
-        debug("Loading live feed from URL...");
         const url = "https://cf.nascar.com/live/feeds/live-feed.json";
         const res = await fetch(url);
         if (!res.ok)
