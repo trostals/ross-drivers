@@ -289,4 +289,4 @@ function flashReloadIndicator() {
 setInterval(() => {
     start();
     flashReloadIndicator();
-}, 30000);
+}, 5000);
