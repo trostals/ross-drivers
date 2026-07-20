@@ -31,6 +31,24 @@ const STAGE_CONFIG = {
     count: 3,
     ends: [80, 160] // Stage 1 ends at lap 80, Stage 2 ends at lap 160
 };
+
+function getCurrentStage(feed) {
+    const lap = feed.lap_number;
+    const ends = STAGE_CONFIG.ends;
+
+    if (lap < ends[0]) return 1;
+    if (lap < ends[1]) return 2;
+
+    // 4-stage races
+    if (STAGE_CONFIG.count === 4) {
+        if (lap < ends[2]) return 3;
+        return 4;
+    }
+
+    // 3-stage races
+    return 3;
+}
+
 /*****************************************************************
 Change this for the 4 stage Coca-Cola 600 race, which has 4 stages.
  const STAGE_CONFIG = {
@@ -38,6 +56,22 @@ Change this for the 4 stage Coca-Cola 600 race, which has 4 stages.
   ends: [100, 200, 300] // Example values
 };
 *******************************************************************/
+
+function getRaceStatus(feed) {
+    const fs = Number(feed.flag_state);
+
+    switch (fs) {
+        case 1: return { text: "Green Flag", color: "#4caf50" };   // green
+        case 2: return { text: "Caution", color: "#fbc02d" };      // yellow
+        case 3: return { text: "Red Flag", color: "#f44336" };     // red
+        case 4: return { text: "White Flag", color: "#ffffff" };   // white
+        case 5: return { text: "Checkered", color: "#000000" };    // black
+        case 9: return { text: "Race Complete", color: "#000000" };
+        default: return { text: "Live", color: "#4caf50" };
+    }
+    
+}
+
 function updateHeader(feed) {
     const lapBadge = document.getElementById("lap-badge");
     const statusPill = document.getElementById("status-pill");
@@ -48,12 +82,26 @@ function updateHeader(feed) {
     lapBadge.style.display = "inline-block";
     lapBadge.textContent = `Lap ${feed.lap_number} / ${feed.laps_in_race}`;
     // Status pill
+    const status = getRaceStatus(feed);
     const label = statusPill.querySelector(".label");
     const dot = statusPill.querySelector(".dot");
-    if (label)
-        label.textContent = "Live";
-    if (dot)
-        dot.style.background = "#4caf50"; // green
+
+    if (label) 
+        label.textContent = status.text;
+
+    if (dot) {
+        dot.style.background = status.color;
+        // Pulse only during green flag
+        if (status.text === "Green Flag") {
+            dot.classList.add("status-pulse");
+        } else {
+            dot.classList.remove("status-pulse");
+        }
+    }
+
+
+    
+   
     // Last updated timestamp
     lastUpdated.textContent = `Updated: ${new Date().toLocaleTimeString()}`;
 }
@@ -79,6 +127,16 @@ function updateRaceName(feed) {
   if (!el) return;
 
   el.textContent = feed.run_name || "NASCAR Stage Points";
+}
+
+function updateStageBadge(stage) {
+    const badge = document.getElementById("stage-badge");
+    if (!badge) return;
+
+    if (stage === 1) badge.textContent = "Stage 1";
+    else if (stage === 2) badge.textContent = "Stage 2";
+    else if (stage === 3) badge.textContent = "Final Stage";
+    else if (stage === 4) badge.textContent = "Stage 4";
 }
 
 function updateStageCards(feed) {
@@ -208,9 +266,27 @@ async function start() {
     updateHeader(feed);
     updateTrackName(feed);
     updateRaceName(feed);
+    
+    const stage = getCurrentStage(feed);
+    updateStageBadge(stage);
+    
     updateStageCards(feed);
     updatePointsTable(points);
 }
 
 start();
 document.getElementById("btn-refresh")?.addEventListener("click", start);
+
+function flashReloadIndicator() {
+    const el = document.getElementById("last-updated");
+    if (!el) return;
+
+    el.style.opacity = "0.3";
+    setTimeout(() => el.style.opacity = "1", 300);
+}
+
+// Auto-refresh every 30 seconds
+setInterval(() => {
+    start();
+    flashReloadIndicator();
+}, 30000);
