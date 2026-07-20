@@ -170,7 +170,6 @@ function buildLiveLookup(feed) {
     const lookup = {};
     for (const v of feed.vehicles) {
         lookup[v.vehicle_number] = v;   // MATCH BY CAR NUMBER
-        debug(`Live data for car #${v.vehicle_number}`);
     }
     return lookup;
 }
@@ -289,4 +288,4 @@ function flashReloadIndicator() {
 setInterval(() => {
     start();
     flashReloadIndicator();
-}, 5000);
+}, 10000);
