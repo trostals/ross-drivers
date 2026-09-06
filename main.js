@@ -18,35 +18,18 @@ const useFile = false;
 let currentFeed = null;
 let raceComplete = false;
 
+const MANUFACTURER_LOGOS = {
+    "Chv": "mfgs/chevrolet.png",
+    "Frd": "mfgs/manufacturers/ford.png",
+    "Tyt": "mfgs/manufacturers/toyota.png"
+};
+
 /* Parse out the player names */
 const DRIVER_TO_PLAYER = {};
 for (const key in PLAYER_PICKS) {
     const pick = PLAYER_PICKS[key];
     DRIVER_TO_PLAYER[pick.id] = pick.name;
     debug(`Mapping driver ID ${pick.id} to player ${pick.name}`);
-}
-
-// Default: 3-stage race
-const STAGE_CONFIG = {
-    count: 3,
-    ends: [80, 160] // Stage 1 ends at lap 80, Stage 2 ends at lap 160
-};
-
-function getCurrentStage(feed) {
-    const lap = feed.lap_number;
-    const ends = STAGE_CONFIG.ends;
-
-    if (lap < ends[0]) return 1;
-    if (lap < ends[1]) return 2;
-
-    // 4-stage races
-    if (STAGE_CONFIG.count === 4) {
-        if (lap < ends[2]) return 3;
-        return 4;
-    }
-
-    // 3-stage races
-    return 3;
 }
 
 /*****************************************************************
@@ -133,39 +116,16 @@ function updateStageBadge(stage) {
     const badge = document.getElementById("stage-badge");
     if (!badge) return;
 
-    if (stage === 1) badge.textContent = "Stage 1";
-    else if (stage === 2) badge.textContent = "Stage 2";
-    else if (stage === 3) badge.textContent = "Final Stage";
-    else if (stage === 4) badge.textContent = "Stage 4";
+    if (stage === 1) 
+        badge.textContent = "Stage 1";
+    else if (stage === 2) 
+        badge.textContent = "Stage 2";
+    else if (stage === 3) 
+        badge.textContent = "Final Stage";
+    else if (stage === 4) 
+        badge.textContent = "Final Stage";
 }
 
-function updateStageCards(feed) {
-    const lap = feed.lap_number;
-    const sc1 = document.getElementById("sc1");
-    const sc2 = document.getElementById("sc2");
-    const sc3 = document.getElementById("sc3");
-    const sc4 = document.getElementById("sc4"); // may not exist
-    const ends = STAGE_CONFIG.ends;
-    // Stage 1
-    sc1.querySelector(".sc-status").textContent =
-        lap < ends[0] ? "In Progress" : "Complete";
-    // Stage 2
-    sc2.querySelector(".sc-status").textContent =
-        lap < ends[0] ? "Upcoming" :
-            lap < ends[1] ? "In Progress" : "Complete";
-    // Stage 3 (exists in both 3-stage and 4-stage races)
-    sc3.querySelector(".sc-status").textContent =
-        lap < ends[1] ? "Upcoming" :
-            lap < (STAGE_CONFIG.count === 4 ? ends[2] : feed.laps_in_race)
-                ? "In Progress"
-                : "Complete";
-    // Stage 4 (only exists in 4-stage races)
-    if (STAGE_CONFIG.count === 4 && sc4) {
-        sc4.querySelector(".sc-status").textContent =
-            lap < ends[2] ? "Upcoming" :
-                lap < feed.laps_in_race ? "In Progress" : "Complete";
-    }
-}
 function buildLiveLookup(feed) {
     const lookup = {};
     for (const v of feed.vehicles) {
@@ -233,7 +193,7 @@ function updatePointsTable(points) {
                 <div class="driver-sub">
                     <span class="car-number">#${liveData?.vehicle_number ?? p.car_number ?? "?"}</span>
                     <span class="dot">•</span>
-                    <span class="manufacturer">${liveData?.vehicle_manufacturer ?? "Unknown"}</span>
+                    <img class="manufacturer-logo" alt="${liveData?.vehicle_manufacturer ?? "Unknown"}">
                 </div>
             </td>
 
@@ -241,6 +201,19 @@ function updatePointsTable(points) {
             <td>${stg2}</td>
             <td>${total}</td>
         `;
+
+        const manu = liveData?.vehicle_manufacturer ?? "Unknown";
+        const logo = MANUFACTURER_LOGOS[manu];
+
+        const img = tr.querySelector(".manufacturer-logo");
+
+        if (img) {
+            if (logo) {
+                img.src = logo;
+            } else {
+                img.src = "mfgs/unknown.png"; // optional fallback
+            }
+        }
 
         tbody.appendChild(tr);
     }
@@ -266,10 +239,9 @@ async function start() {
     updateTrackName(feed);
     updateRaceName(feed);
     
-    const stage = getCurrentStage(feed);
+    const stage = feed.stage.stage_num
     updateStageBadge(stage);
     
-    updateStageCards(feed);
     updatePointsTable(points);
 }
 
