@@ -8,7 +8,7 @@ import { PLAYER_PICKS } from "./config.js";
 ----------------------------------------------------------- */
 const db_status = document.getElementById("db_status");
 
-const debugEnabled = true; // Set to false to disable debug messages
+const debugEnabled = false; // Set to false to disable debug messages
 
 function debug(msg) {
     if (!debugEnabled) 
@@ -24,7 +24,7 @@ function debug(msg) {
     }
 }
 // useFile flag for using stored data vs live data.
-const useFile = true;
+const useFile = false;
 
 let currentFeed = null;
 let raceComplete = false;
