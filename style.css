@@ -103,17 +103,22 @@ td.driver-cell {
   overflow-wrap: normal;
 }
 
+.driver-block {
+    white-space: normal;
+    overflow-wrap: break-word;
+}
+
 td.col-driver {
-  white-space: nowrap;
   padding-left: 4px;
   padding-right: 4px;
+  white-space: normal !important;
+  width: 1% !important;
 }
 
 td.col-player {
   padding-right: 6px;
   white-space: no-wrap;  /* allows wrapping */
 }
-
 
 .pos-cell { 
   font-size: 1rem; 
@@ -185,7 +190,7 @@ footer { max-width: 900px; margin: 2rem auto 0; padding: 0 1rem; font-size: .68r
   col.col-s1,
   col.col-s2,
   col.col-total {
-    width: auto;
+    width: auto !important;
   }
    
   /* Tighter cell spacing */
@@ -199,11 +204,19 @@ footer { max-width: 900px; margin: 2rem auto 0; padding: 0 1rem; font-size: .68r
     overflow-wrap: break-word;
   }
 
-  .manufacturer-logo {
+  .driver-sub {
+    display: flex !important;
+    align-items: center;
+    gap: 4px;
+}
+
+
+
+.manufacturer-logo {
     height: 18px;
     width: auto;
-    vertical-align: middle;
-  }
+}
+
   .stage-strip { 
     flex-direction: column; 
   }

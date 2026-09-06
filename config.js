@@ -1,7 +1,7 @@
 export const PLAYER_PICKS = {
-  Blake:      { id: 4023, name: "Blake" }, // Blaney
-  The_DAD:    { id: 4045, name: "The DAD" }, // Bowman *
-  Lisa_Marie: { id: 4326, name: "Lisa Marie" }, //Hoscevar *
-  Lisa_Lane:  { id: 4092, name: "Lisa Lane" }, // Nemecheck *
-  Todd:       { id: 3832, name: "Todd" } // McDowell  *
+  Blake:      { id: 3989, name: "Blake" }, // Buescher +
+  The_DAD:    { id: 1361, name: "The DAD" }, // Hamlin +
+  Lisa_Marie: { id: 4228, name: "Lisa Marie" }, //Briscoe + 
+  Lisa_Lane:  { id: 4045, name: "Lisa Lane" }, // Bowman +
+  Todd:       { id: 4065, name: "Todd" } // Redick + 
 };

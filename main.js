@@ -8,20 +8,31 @@ import { PLAYER_PICKS } from "./config.js";
 ----------------------------------------------------------- */
 const db_status = document.getElementById("db_status");
 
+const debugEnabled = true; // Set to false to disable debug messages
+
 function debug(msg) {
-    db_status.innerHTML += msg + "\n";
-    db_status.scrollTop = db_status.scrollHeight;
+    if (!debugEnabled) 
+    {
+        db_status.innerHTML ="";
+        db_status.style.display = "none";
+        return;
+    }
+    else
+    {
+        db_status.innerHTML += msg + "\n";
+        db_status.scrollTop = db_status.scrollHeight;
+    }
 }
-// Debug flag for using storede data vs live data.
-const useFile = false;
+// useFile flag for using stored data vs live data.
+const useFile = true;
 
 let currentFeed = null;
 let raceComplete = false;
 
 const MANUFACTURER_LOGOS = {
     "Chv": "mfgs/chevrolet.png",
-    "Frd": "mfgs/manufacturers/ford.png",
-    "Tyt": "mfgs/manufacturers/toyota.png"
+    "Frd": "mfgs/ford.png",
+    "Tyt": "mfgs/toyota.png"
 };
 
 /* Parse out the player names */
@@ -193,7 +204,7 @@ function updatePointsTable(points) {
                 <div class="driver-sub">
                     <span class="car-number">#${liveData?.vehicle_number ?? p.car_number ?? "?"}</span>
                     <span class="dot">•</span>
-                    <img class="manufacturer-logo" alt="${liveData?.vehicle_manufacturer ?? "Unknown"}">
+                    <span class="manufacturer-box"></span>
                 </div>
             </td>
 
@@ -202,25 +213,27 @@ function updatePointsTable(points) {
             <td>${total}</td>
         `;
 
-        const manu = liveData?.vehicle_manufacturer ?? "Unknown";
-        const logo = MANUFACTURER_LOGOS[manu];
+        const box = tr.querySelector(".manufacturer-box");
+        const mfg = liveData?.vehicle_manufacturer ?? p.manufacturer;
 
-        const img = tr.querySelector(".manufacturer-logo");
-
-        if (img) {
-            if (logo) {
-                img.src = logo;
-            } else {
-                img.src = "mfgs/unknown.png"; // optional fallback
-            }
+        if (MANUFACTURER_LOGOS[mfg]) {
+            const img = document.createElement("img");
+            img.src = MANUFACTURER_LOGOS[mfg];
+            img.height = 18;
+            img.style.position = "relative";
+            img.style.top = "4px";
+            debug("Img: " + img.src + "Height: " + img.height + " Width: " + img.width + " Manufacturer: " + mfg);
+            box.appendChild(img);
+            
         }
+
 
         tbody.appendChild(tr);
     }
 }
 
 async function start() {
-    debug:("Starting data load...");
+    debug("Starting data load...");
 
     const feed = await loadLiveFeed(useFile);
     const points = await loadLivePoints(useFile);
