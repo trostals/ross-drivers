@@ -1,7 +1,7 @@
 export const PLAYER_PICKS = {
-  Blake:      { id: 3989, name: "Blake" }, // Buescher +
-  The_DAD:    { id: 1361, name: "The DAD" }, // Hamlin +
-  Lisa_Marie: { id: 4228, name: "Lisa Marie" }, //Briscoe + 
-  Lisa_Lane:  { id: 4184, name: "Lisa Lane" }, // Byron +
-  Todd:       { id: 4065, name: "Todd" } // Redick + 
+  Blake:      { id: 4030, name: "Blake" }, // larson
+  The_DAD:    { id: 4153, name: "The DAD" }, // Bell
+  Lisa_Marie: { id: 4023, name: "Lisa Marie" }, //Blaney
+  Lisa_Lane:  { id: 4228, name: "Lisa Lane" }, // briscoe
+  Todd:       { id: 3859, name: "Todd" } // logano
 };
