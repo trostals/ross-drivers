@@ -145,6 +145,12 @@ function buildLiveLookup(feed) {
     return lookup;
 }
 
+// This gets rid of the Chase indicator "(C)" in driver names, which is not needed for our display.
+function cleanDriverName(name)
+{
+  return name.replace(/\s*\(C\)$/i, "");
+}
+
 function updatePointsTable(points) {
     const tbody = document.getElementById("points-tbody");
     if (!tbody) {
@@ -194,13 +200,17 @@ function updatePointsTable(points) {
             total = stg1 + stg2;
         }
 
+        // Create driver's names and clean the last name to remove any "(C)" chase indicators.:
+        const fName = String(p.first_name);
+        const lName = cleanDriverName(String(p.last_name));
+
         // Build row
         tr.innerHTML = `
             <td>${runningPos}</td>
             <td>${player}</td>
 
             <td class="driver-block">
-                <div class="driver-name">${p.first_name} ${p.last_name}</div>
+                <div class="driver-name">${fName} ${lName}</div>
                 <div class="driver-sub">
                     <span class="car-number">#${liveData?.vehicle_number ?? p.car_number ?? "?"}</span>
                     <span class="dot">•</span>
